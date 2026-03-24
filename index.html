@@ -337,8 +337,9 @@ const NAMESPACE_RULES = [
   [/pocketmine\\level\\/g, 'pocketmine\\world\\'],
   // Event level -> world
   [/pocketmine\\event\\level\\/g, 'pocketmine\\event\\world\\'],
-  [/LevelLoadEvent/g, 'WorldLoadEvent'],
-  [/LevelUnloadEvent/g, 'WorldUnloadEvent'],
+  [/\bLevelLoadEvent\b/g, 'WorldLoadEvent'],
+  [/\bLevelUnloadEvent\b/g, 'WorldUnloadEvent'],
+  [/\bLevelInitEvent\b/g, 'WorldInitEvent'],
   // Tile -> Block\Tile
   [/pocketmine\\tile\\Tile/g, 'pocketmine\\block\\tile\\Tile'],
   [/pocketmine\\tile\\Spawnable/g, 'pocketmine\\block\\tile\\Spawnable'],
@@ -403,8 +404,16 @@ const NAMESPACE_RULES = [
   [/\bBaseLang\b/g, 'Language'],
   [/\bTranslationContainer\b/g, 'Translatable'],
   [/\bTextContainer\b/g, 'Translatable'],
-  // Interface rename
+  // Interface/class renames (standalone, not just in use statements)
   [/implements\s+PluginIdentifiableCommand/g, 'implements PluginOwned'],
+  [/\bPluginIdentifiableCommand\b/g, 'PluginOwned'],
+  [/\bAdvancedSourceInterface\b/g, 'AdvancedNetworkInterface'],
+  [/(?<!Advanced)\bSourceInterface\b/g, 'NetworkInterface'],
+  // Level → World in type hints, PHPDoc, return types, parameters
+  [/([\s(,|:])Level(?=\s+\$|\s*\||\s*\[\]|\s*\?\s|\s*,|\s*\))/g, '$1World', 'Level type hint → World'],
+  [/(\?|@var\s+|@param\s+|@return\s+)Level\b/g, '$1World', 'Level PHPDoc → World'],
+  [/\bLevel::(DIFFICULTY_|TIME_|Y_MAX|Y_MIN)/g, 'World::$1', 'Level::CONST → World::CONST'],
+  [/\bLevel::class\b/g, 'World::class', 'Level::class → World::class'],
   // BlockIds rename
   [/\bBlockLegacyIds\b/g, 'BlockTypeIds'],
   [/\bBlockIds\b(?!::)/g, 'BlockTypeIds'],
@@ -719,6 +728,8 @@ function convertCode(input) {
       [/->getGamemode\(\)/g, 'GameMode is now a class, not int — verify usage'],
       // json_encode on items
       [/json_encode\(\s*\$\w*[iI]tem/g, 'json_encode() on Items no longer works in PM5 — use Item serialization methods'],
+      // setCancelled() with expression
+      [/->setCancelled\([^)]*\$[^)]+\)/g, 'setCancelled($expr) needs manual review — use cancel()/uncancel() conditionally'],
       // Interaction air clicks removed
       [/PlayerInteractEvent::(?:RIGHT|LEFT)_CLICK_AIR/g, 'Air click types removed from PlayerInteractEvent'],
       // Server removed methods
