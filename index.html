@@ -414,6 +414,8 @@ const NAMESPACE_RULES = [
   [/(\?|@var\s+|@param\s+|@return\s+)Level\b/g, '$1World', 'Level PHPDoc → World'],
   [/\bLevel::(DIFFICULTY_|TIME_|Y_MAX|Y_MIN)/g, 'World::$1', 'Level::CONST → World::CONST'],
   [/\bLevel::class\b/g, 'World::class', 'Level::class → World::class'],
+  [/\binstanceof\s+Level\b/g, 'instanceof World', 'instanceof Level → instanceof World'],
+  [/\bnew\s+Level\s*\(/g, 'new World(', 'new Level() → new World()'],
   // BlockIds rename
   [/\bBlockLegacyIds\b/g, 'BlockTypeIds'],
   [/\bBlockIds\b(?!::)/g, 'BlockTypeIds'],
