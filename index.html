@@ -745,16 +745,41 @@ function convertCode(input) {
 }
 
 function highlightPHP(code) {
-  return code
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/(\/\/.*$|\/\*[\s\S]*?\*\/|#.*$)/gm, '<span class="cmt">$1</span>')
-    .replace(/('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")/g, '<span class="str">$1</span>')
-    .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="num">$1</span>')
-    .replace(/(\$\w+)/g, '<span class="var">$1</span>')
-    .replace(/(->|::)/g, '<span class="arrow">$1</span>')
-    .replace(/\b(use|namespace|class|extends|implements|function|return|if|else|elseif|foreach|for|while|switch|case|break|continue|new|public|protected|private|static|final|abstract|const|throw|try|catch|finally|yield|match|enum|readonly|true|false|null|void|int|string|float|bool|array|self|parent)\b/g, '<span class="kw">$1</span>');
+  // Tokenizer approach: split code into tokens FIRST, then wrap each token.
+  // This prevents regexes from matching inside already-inserted HTML tags.
+  const KW = /^(use|namespace|class|extends|implements|function|return|if|else|elseif|foreach|for|while|switch|case|break|continue|new|public|protected|private|static|final|abstract|const|throw|try|catch|finally|yield|match|enum|readonly|true|false|null|void|int|string|float|bool|array|self|parent)$/;
+  // Master regex: order matters — first match wins
+  const TOKEN = /\/\*[\s\S]*?\*\/|\/\/.*$|#.*$|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\$\w+|->|::|[a-zA-Z_]\w*|\d+(?:\.\d+)?|[^\s]/gm;
+  let out = '';
+  let lastIdx = 0;
+  let m;
+  while ((m = TOKEN.exec(code)) !== null) {
+    // Preserve whitespace between tokens
+    if (m.index > lastIdx) out += esc(code.slice(lastIdx, m.index));
+    const t = m[0];
+    const e = esc(t);
+    if (t[0] === '/' && (t[1] === '*' || t[1] === '/') || t[0] === '#' && !t.startsWith('#[')) {
+      out += '<span class="cmt">' + e + '</span>';
+    } else if (t[0] === '"' || t[0] === "'") {
+      out += '<span class="str">' + e + '</span>';
+    } else if (t[0] === '$') {
+      out += '<span class="var">' + e + '</span>';
+    } else if (t === '->' || t === '::') {
+      out += '<span class="arrow">' + e + '</span>';
+    } else if (/^\d/.test(t)) {
+      out += '<span class="num">' + e + '</span>';
+    } else if (KW.test(t)) {
+      out += '<span class="kw">' + e + '</span>';
+    } else {
+      out += e;
+    }
+    lastIdx = m.index + t.length;
+  }
+  if (lastIdx < code.length) out += esc(code.slice(lastIdx));
+  return out;
+}
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function renderLog() {
