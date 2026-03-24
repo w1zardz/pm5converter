@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
+<title>PM5 Converter — Upgrade PocketMine-MP Plugins from PM3/PM4 to PM5 Online</title>
+<meta name="description" content="Free online tool to automatically convert PocketMine-MP plugins from API 3.x/4.x to API 5.x. Supports namespace changes, method renames, event API updates, Level→World migration, and 120+ conversion rules. Works on mobile.">
+<meta name="keywords" content="PocketMine,PocketMine-MP,PMMP,PM5,PM3,PM4,converter,migration,upgrade,plugin,Minecraft,Bedrock Edition,Pocket Edition,PHP,API 5,pocketmine plugin converter,pmmp converter,pm5 migration tool,pocketmine upgrade tool,minecraft bedrock plugin,mcpe plugin,pocketmine level to world,pocketmine api changes">
+<meta name="author" content="w1zardz">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0d1117">
+<meta name="color-scheme" content="dark light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="canonical" href="https://w1zardz.github.io/pm5converter/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PM5 Converter — Upgrade PocketMine-MP Plugins to PM5">
+<meta property="og:description" content="Free online tool to automatically convert PocketMine-MP plugins from API 3.x/4.x to PM5. 120+ conversion rules, works in browser.">
+<meta property="og:url" content="https://w1zardz.github.io/pm5converter/">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ru_RU">
+<meta property="og:site_name" content="PM5 Converter">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PM5 Converter — PocketMine-MP Plugin Migration Tool">
+<meta name="twitter:description" content="Automatically upgrade PM3/PM4 plugins to PM5. Free, open-source, works in browser.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"PM5 Converter","description":"Free online tool to automatically convert PocketMine-MP plugins from API 3.x/4.x to API 5.x","url":"https://w1zardz.github.io/pm5converter/","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"w1zardz","url":"https://github.com/w1zardz"}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is PM5 Converter?","acceptedAnswer":{"@type":"Answer","text":"PM5 Converter is a free online tool that automatically converts PocketMine-MP plugin code from API 3.x/4.x to API 5.x. It handles namespace changes, method renames, event API updates, and 120+ other conversion rules."}},{"@type":"Question","name":"What changes does PM5 Converter handle?","acceptedAnswer":{"@type":"Answer","text":"It converts Level→World namespace changes, numeric Item/Block IDs to VanillaItems/VanillaBlocks, event cancellation API, Task signature changes, Entity creation updates, permission system changes, and many more breaking API changes."}},{"@type":"Question","name":"Is it safe to use? Will it break my code?","acceptedAnswer":{"@type":"Answer","text":"The converter uses pattern-based replacements and handles most common API changes. However, some complex patterns may need manual review. Always check the conversion log and test your plugin after conversion."}},{"@type":"Question","name":"Does it work on mobile devices?","acceptedAnswer":{"@type":"Answer","text":"Yes! PM5 Converter is fully optimized for mobile devices with touch-friendly controls, responsive layout, and works entirely in your browser without uploading files to any server."}}]}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--surface3:#1c2129;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--accent:#58a6ff;--accent2:#388bfd;--accent-glow:rgba(88,166,255,.15);--green:#3fb950;--green2:#2ea043;--green-glow:rgba(63,185,80,.15);--red:#f85149;--orange:#d29922;--purple:#bc8cff;--radius:12px;--radius-sm:8px;--shadow:0 8px 32px rgba(0,0,0,.3);--transition:all .2s ease;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;--mono:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace}
+@media(prefers-color-scheme:light){:root{--bg:#ffffff;--surface:#f6f8fa;--surface2:#eaeef2;--surface3:#f0f3f6;--border:#d0d7de;--text:#1f2328;--text2:#656d76;--shadow:0 8px 32px rgba(0,0,0,.08)}}
+html{font-size:16px;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100dvh;min-height:100vh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.skip{position:absolute;top:-40px;left:0;background:var(--accent);color:#fff;padding:8px 16px;z-index:100;border-radius:0 0 var(--radius-sm) 0}
+.skip:focus{top:0}
+.container{max-width:1100px;margin:0 auto;padding:0 clamp(12px,4vw,24px)}
+header{text-align:center;padding:clamp(24px,6vw,48px) 0 clamp(16px,4vw,32px)}
+h1{font-size:clamp(1.4rem,5vw,2.2rem);font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,var(--green),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;margin-bottom:8px}
+.subtitle{color:var(--text2);font-size:clamp(.85rem,2.5vw,1.05rem);max-width:600px;margin:0 auto}
+.badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:12px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text2)}
+.badge.green{border-color:var(--green);color:var(--green);background:var(--green-glow)}
+.badge.blue{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:768px){.editor-wrap{grid-template-columns:1fr;gap:12px}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2);gap:8px;flex-wrap:wrap}
+.panel-head h2{font-size:.85rem;font-weight:600;white-space:nowrap}
+.panel-head .tag{font-size:.7rem;padding:2px 8px;border-radius:12px;font-weight:600}
+.tag.old{background:rgba(248,81,73,.15);color:var(--red)}
+.tag.new{background:var(--green-glow);color:var(--green)}
+.code-area{width:100%;min-height:clamp(200px,40vh,400px);max-height:60vh;padding:16px;font-family:var(--mono);font-size:clamp(.78rem,2vw,.88rem);line-height:1.65;border:none;background:transparent;color:var(--text);resize:vertical;outline:none;tab-size:4;-moz-tab-size:4;white-space:pre;overflow:auto}
+.code-area::placeholder{color:var(--text2);opacity:.6}
+.code-area:focus{box-shadow:inset 0 0 0 1px var(--accent)}
+.output-area{width:100%;min-height:clamp(200px,40vh,400px);max-height:60vh;padding:16px;font-family:var(--mono);font-size:clamp(.78rem,2vw,.88rem);line-height:1.65;background:transparent;color:var(--text);overflow:auto;white-space:pre;tab-size:4;-moz-tab-size:4;-webkit-user-select:all;user-select:all}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:24px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border:none;border-radius:var(--radius-sm);font-family:var(--font);font-size:.95rem;font-weight:600;cursor:pointer;transition:var(--transition);min-height:48px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);background:var(--accent-glow)}
+.btn-copy{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff}
+.btn-copy:hover{filter:brightness(1.1)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.log-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px;overflow:hidden;display:none}
+.log-panel.active{display:block}
+.log-head{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between}
+.log-head h2{font-size:.85rem;font-weight:600}
+.log-count{font-size:.75rem;padding:2px 10px;border-radius:12px;font-weight:700;background:var(--green-glow);color:var(--green)}
+.log-body{padding:12px 16px;max-height:300px;overflow:auto;font-family:var(--mono);font-size:.8rem;line-height:1.8}
+.log-item{padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start}
+.log-item:last-child{border-bottom:none}
+.log-icon{flex-shrink:0;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;margin-top:3px}
+.log-icon.replace{background:var(--green-glow);color:var(--green)}
+.log-icon.warn{background:rgba(210,153,34,.15);color:var(--orange)}
+.log-icon.info{background:var(--accent-glow);color:var(--accent)}
+.log-text{flex:1;word-break:break-word}
+.log-text code{background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:.78rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;text-align:center}
+.stat-val{font-size:1.8rem;font-weight:800;color:var(--green)}
+.stat-label{font-size:.78rem;color:var(--text2);margin-top:2px}
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:clamp(24px,6vw,40px);text-align:center;cursor:pointer;transition:var(--transition);margin-bottom:24px;position:relative}
+.dropzone:hover,.dropzone.dragover{border-color:var(--accent);background:var(--accent-glow)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dropzone-text{color:var(--text2);font-size:.9rem}
+.dropzone-text strong{color:var(--text);display:block;margin-bottom:4px;font-size:1rem}
+.info-section{margin:clamp(32px,8vw,56px) 0}
+.info-section h2{font-size:clamp(1.1rem,3vw,1.5rem);font-weight:700;margin-bottom:16px;color:var(--text)}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:24px}
+.info-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.info-card h3{font-size:.95rem;font-weight:600;margin-bottom:8px;color:var(--accent)}
+.info-card p,.info-card ul{font-size:.85rem;color:var(--text2);line-height:1.7}
+.info-card ul{padding-left:20px}
+.info-card ul li{margin-bottom:4px}
+details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden}
+summary{padding:14px 16px;cursor:pointer;font-weight:600;font-size:.9rem;list-style:none;display:flex;align-items:center;gap:8px;min-height:44px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'\203A';font-size:1.2rem;font-weight:700;color:var(--text2);transition:transform .2s;flex-shrink:0;width:16px;text-align:center}
+details[open] summary::before{transform:rotate(90deg)}
+details .faq-body{padding:0 16px 14px;font-size:.85rem;color:var(--text2);line-height:1.7}
+footer{text-align:center;padding:clamp(24px,6vw,48px) 0;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border)}
+footer a{color:var(--accent)}
+.highlight .kw{color:var(--purple)}
+.highlight .fn{color:var(--accent)}
+.highlight .str{color:var(--green)}
+.highlight .cmt{color:var(--text2)}
+.highlight .num{color:var(--orange)}
+.highlight .var{color:#ffa657}
+.highlight .cls{color:#79c0ff}
+.highlight .arrow{color:var(--text2)}
+.options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;justify-content:center}
+.opt{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;cursor:pointer;transition:var(--transition);min-height:36px;-webkit-tap-highlight-color:transparent}
+.opt:hover{border-color:var(--accent)}
+.opt input[type=checkbox]{accent-color:var(--green);width:16px;height:16px}
+.opt label{cursor:pointer;white-space:nowrap}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+@media(max-width:480px){.stats{grid-template-columns:1fr 1fr}.actions{flex-direction:column}.actions .btn{width:100%}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="container">
+<header>
+<h1>PM5 Converter</h1>
+<p class="subtitle">Automatically upgrade your PocketMine-MP plugins from API 3.x / 4.x to API 5.x — free, open-source, 100% client-side</p>
+<div class="badges">
+<span class="badge green">120+ Rules</span>
+<span class="badge blue">PM3 / PM4 &rarr; PM5</span>
+<span class="badge">No Upload</span>
+<span class="badge">Mobile Ready</span>
+</div>
+</header>
+
+<main id="main">
+<div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="Upload PHP files">
+<input type="file" id="fileInput" accept=".php,.yml,.yaml,.txt" multiple aria-label="Select files">
+<div class="dropzone-text">
+<strong>Drop PHP files here or tap to browse</strong>
+Supports .php and plugin.yml files
+</div>
+</div>
+
+<div class="options" role="group" aria-label="Conversion options">
+<div class="opt"><input type="checkbox" id="optNs" checked><label for="optNs">Namespaces</label></div>
+<div class="opt"><input type="checkbox" id="optMethods" checked><label for="optMethods">Methods</label></div>
+<div class="opt"><input type="checkbox" id="optEvents" checked><label for="optEvents">Events</label></div>
+<div class="opt"><input type="checkbox" id="optItems" checked><label for="optItems">Items/Blocks</label></div>
+<div class="opt"><input type="checkbox" id="optTasks" checked><label for="optTasks">Tasks</label></div>
+<div class="opt"><input type="checkbox" id="optYml" checked><label for="optYml">plugin.yml</label></div>
+</div>
+
+<div class="editor-wrap">
+<div class="panel">
+<div class="panel-head">
+<h2>Input Code</h2>
+<span class="tag old">PM3 / PM4</span>
+</div>
+<textarea class="code-area" id="inputCode" placeholder="<?php
+
+namespace YourPlugin;
+
+use pocketmine\plugin\PluginBase;
+use pocketmine\Player;
+use pocketmine\level\Level;
+use pocketmine\item\Item;
+
+class Main extends PluginBase {
+    public function onEnable() {
+        // Your old plugin code here...
+    }
+}" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" aria-label="Input PHP code (PM3/PM4)"></textarea>
+</div>
+<div class="panel">
+<div class="panel-head">
+<h2>Output Code</h2>
+<span class="tag new">PM5</span>
+</div>
+<div class="output-area" id="outputCode" role="textbox" aria-readonly="true" aria-label="Converted PHP code (PM5)"></div>
+</div>
+</div>
+
+<div class="actions">
+<button class="btn btn-primary" id="convertBtn" aria-label="Convert code to PM5">Convert to PM5</button>
+<button class="btn btn-copy" id="copyBtn" disabled aria-label="Copy converted code">Copy Result</button>
+<button class="btn btn-secondary" id="clearBtn" aria-label="Clear all">Clear</button>
+<button class="btn btn-secondary" id="downloadBtn" disabled aria-label="Download converted file">Download</button>
+</div>
+
+<div class="stats" id="statsPanel" style="display:none" role="status" aria-live="polite">
+<div class="stat"><div class="stat-val" id="statChanges">0</div><div class="stat-label">Changes Made</div></div>
+<div class="stat"><div class="stat-val" id="statWarnings">0</div><div class="stat-label">Warnings</div></div>
+<div class="stat"><div class="stat-val" id="statLines">0</div><div class="stat-label">Lines Processed</div></div>
+</div>
+
+<div class="log-panel" id="logPanel">
+<div class="log-head">
+<h2>Conversion Log</h2>
+<span class="log-count" id="logCount">0</span>
+</div>
+<div class="log-body" id="logBody"></div>
+</div>
+
+<section class="info-section">
+<h2>What Changed in PM5?</h2>
+<div class="info-grid">
+<div class="info-card">
+<h3>Level &rarr; World</h3>
+<p>The entire <code>pocketmine\level</code> namespace was renamed to <code>pocketmine\world</code>. All Level references, including Server methods like <code>getLevels()</code>, are now <code>getWorldManager()-&gt;getWorlds()</code>.</p>
+</div>
+<div class="info-card">
+<h3>Numeric IDs Removed</h3>
+<p>No more <code>Item::get(256)</code> or <code>Block::get(1)</code>. Use <code>VanillaItems::IRON_SHOVEL()</code> and <code>VanillaBlocks::STONE()</code> instead. String parsing via <code>StringToItemParser</code>.</p>
+</div>
+<div class="info-card">
+<h3>Event API Overhaul</h3>
+<p><code>setCancelled(true)</code> becomes <code>cancel()</code>. Events are called via <code>$event-&gt;call()</code> instead of <code>PluginManager-&gt;callEvent()</code>. Handlers skip cancelled events by default.</p>
+</div>
+<div class="info-card">
+<h3>Entity System Rewrite</h3>
+<p>No more <code>Entity::createEntity()</code>. Entities use direct constructors with <code>Location</code>. NBT is handled via <code>initEntity()</code>/<code>saveNBT()</code> instead of public <code>namedtag</code>.</p>
+</div>
+<div class="info-card">
+<h3>Player API Split</h3>
+<p><code>Player</code> moved to <code>pocketmine\player\Player</code>. Network methods moved to <code>getNetworkSession()</code>. Effects, hunger, XP use sub-managers.</p>
+</div>
+<div class="info-card">
+<h3>Task Signatures</h3>
+<p><code>Task-&gt;onRun($currentTick)</code> becomes <code>onRun(): void</code>. <code>PluginTask</code> removed — use <code>Task</code> or <code>ClosureTask</code>. AsyncTask callbacks lost their <code>Server</code> parameter.</p>
+</div>
+</div>
+</section>
+
+<section class="info-section">
+<h2>Conversion Rules</h2>
+<div class="info-grid">
+<div class="info-card">
+<h3>Namespace Replacements</h3>
+<ul>
+<li><code>pocketmine\level\*</code> &rarr; <code>pocketmine\world\*</code></li>
+<li><code>pocketmine\tile\*</code> &rarr; <code>pocketmine\block\tile\*</code></li>
+<li><code>pocketmine\Player</code> &rarr; <code>pocketmine\player\Player</code></li>
+<li><code>pocketmine\utils\UUID</code> &rarr; <code>Ramsey\Uuid\Uuid</code></li>
+</ul>
+</div>
+<div class="info-card">
+<h3>Method Conversions</h3>
+<ul>
+<li><code>onActivate()</code> &rarr; <code>onInteract()</code></li>
+<li><code>getLevel()</code> &rarr; <code>getWorld()</code></li>
+<li><code>addEffect()</code> &rarr; <code>getEffects()-&gt;add()</code></li>
+<li><code>getFood()</code> &rarr; <code>getHungerManager()-&gt;getFood()</code></li>
+</ul>
+</div>
+<div class="info-card">
+<h3>Visibility & Signatures</h3>
+<ul>
+<li><code>public function onEnable()</code> &rarr; <code>protected function onEnable(): void</code></li>
+<li><code>onRun($currentTick)</code> &rarr; <code>onRun(): void</code></li>
+<li><code>onCompletion(Server $s)</code> &rarr; <code>onCompletion(): void</code></li>
+</ul>
+</div>
+</div>
+</section>
+
+<section class="info-section">
+<h2>Frequently Asked Questions</h2>
+<details>
+<summary>What is PM5 Converter?</summary>
+<div class="faq-body">PM5 Converter is a free, open-source, browser-based tool that automatically converts PocketMine-MP plugin PHP code from API 3.x/4.x to API 5.x. It applies 120+ conversion rules covering namespace changes, method renames, event API updates, and more. No server upload required — everything runs in your browser.</div>
+</details>
+<details>
+<summary>Will it convert my plugin perfectly?</summary>
+<div class="faq-body">The converter handles most common API changes automatically, including namespace migrations, method renames, event API changes, and plugin.yml updates. However, complex patterns like custom entity registration, advanced NBT manipulation, or Item/Block numeric ID lookups may need manual adjustments. Always review the conversion log and test thoroughly.</div>
+</details>
+<details>
+<summary>What PocketMine-MP versions are supported?</summary>
+<div class="faq-body">The converter supports input code written for PocketMine-MP API 3.x (PM3) and API 4.x (PM4), converting it to API 5.x (PM5). It covers the full migration path including PM3→PM4 and PM4→PM5 changes in a single pass.</div>
+</details>
+<details>
+<summary>Is my code safe? Does it upload anywhere?</summary>
+<div class="faq-body">Your code never leaves your device. PM5 Converter runs entirely in your browser using JavaScript. No data is sent to any server. The tool is open-source — you can inspect the code on GitHub.</div>
+</details>
+<details>
+<summary>Can I convert multiple files at once?</summary>
+<div class="faq-body">Yes! You can drag and drop multiple .php files onto the upload area. Each file will be converted separately, and you can download all results. For large plugins, consider converting file by file to review changes carefully.</div>
+</details>
+<details>
+<summary>Does it handle plugin.yml changes?</summary>
+<div class="faq-body">Yes. When you enable the "plugin.yml" option, the converter updates the API version to 5.0.0, adjusts permission defaults, and flags deprecated features like nested permissions.</div>
+</details>
+</section>
+</main>
+
+<footer>
+<p>Made with care for the PocketMine-MP community by <a href="https://github.com/w1zardz" target="_blank" rel="noopener">w1zardz</a></p>
+<p style="margin-top:6px">Open-source on <a href="https://github.com/w1zardz/pm5converter" target="_blank" rel="noopener">GitHub</a> &middot; PocketMine-MP is a project by <a href="https://github.com/pmmp" target="_blank" rel="noopener">PMMP Team</a></p>
+</footer>
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// PM5 CONVERTER — Conversion Rules
+// Based on official PocketMine-MP migration guides
+// Bugs from Akari-my/pm5converter fixed:
+//   - getScheduler()→getAsyncPool() was WRONG (getScheduler still exists for Task)
+//   - sendMessage() class injection was WRONG
+//   - getCompound()→getList() was WRONG
+//   - Regex replacements had literal /i in output
+//   - Overly broad patterns (getByte, getShort etc.) broke non-NBT code
+//   - Level→World replacement too aggressive in variable names
+//   - Double getNetworkSession() wrapping if code already updated
+// ============================================================
+
+const NAMESPACE_RULES = [
+  // Level -> World (specific first, then general)
+  [/pocketmine\\level\\Level(?=\b|;|,|\s)/g, 'pocketmine\\world\\World'],
+  [/pocketmine\\level\\Position/g, 'pocketmine\\world\\Position'],
+  [/pocketmine\\level\\Location/g, 'pocketmine\\entity\\Location'],
+  [/pocketmine\\level\\Explosion/g, 'pocketmine\\world\\Explosion'],
+  [/pocketmine\\level\\particle\\/g, 'pocketmine\\world\\particle\\'],
+  [/pocketmine\\level\\sound\\/g, 'pocketmine\\world\\sound\\'],
+  [/pocketmine\\level\\generator\\/g, 'pocketmine\\world\\generator\\'],
+  [/pocketmine\\level\\format\\/g, 'pocketmine\\world\\format\\'],
+  [/pocketmine\\level\\biome\\/g, 'pocketmine\\world\\biome\\'],
+  [/pocketmine\\level\\/g, 'pocketmine\\world\\'],
+  // Event level -> world
+  [/pocketmine\\event\\level\\/g, 'pocketmine\\event\\world\\'],
+  [/LevelLoadEvent/g, 'WorldLoadEvent'],
+  [/LevelUnloadEvent/g, 'WorldUnloadEvent'],
+  // Tile -> Block\Tile
+  [/pocketmine\\tile\\Tile/g, 'pocketmine\\block\\tile\\Tile'],
+  [/pocketmine\\tile\\Spawnable/g, 'pocketmine\\block\\tile\\Spawnable'],
+  [/pocketmine\\tile\\Chest(?!Inventory)/g, 'pocketmine\\block\\tile\\Chest'],
+  [/pocketmine\\tile\\Sign/g, 'pocketmine\\block\\tile\\Sign'],
+  [/pocketmine\\tile\\Furnace/g, 'pocketmine\\block\\tile\\Furnace'],
+  [/pocketmine\\tile\\EnchantTable/g, 'pocketmine\\block\\tile\\EnchantTable'],
+  [/pocketmine\\tile\\Banner/g, 'pocketmine\\block\\tile\\Banner'],
+  [/pocketmine\\tile\\Skull/g, 'pocketmine\\block\\tile\\MobHead'],
+  [/pocketmine\\tile\\FlowerPot/g, 'pocketmine\\block\\tile\\FlowerPot'],
+  [/pocketmine\\tile\\ItemFrame/g, 'pocketmine\\block\\tile\\ItemFrame'],
+  [/pocketmine\\tile\\Hopper/g, 'pocketmine\\block\\tile\\Hopper'],
+  [/pocketmine\\tile\\BrewingStand/g, 'pocketmine\\block\\tile\\BrewingStand'],
+  [/pocketmine\\tile\\Bed/g, 'pocketmine\\block\\tile\\Bed'],
+  [/pocketmine\\tile\\/g, 'pocketmine\\block\\tile\\'],
+  // Player namespace
+  [/(use\s+)pocketmine\\Player\b/g, '$1pocketmine\\player\\Player'],
+  [/pocketmine\\IPlayer/g, 'pocketmine\\player\\IPlayer'],
+  [/pocketmine\\OfflinePlayer/g, 'pocketmine\\player\\OfflinePlayer'],
+  [/pocketmine\\Achievement/g, 'pocketmine\\player\\Achievement'],
+  // Effect namespace
+  [/pocketmine\\effect\\Effect(?=\b)/g, 'pocketmine\\entity\\effect\\Effect'],
+  [/pocketmine\\effect\\EffectInstance/g, 'pocketmine\\entity\\effect\\EffectInstance'],
+  // Inventory moves to block\inventory
+  [/pocketmine\\inventory\\AnvilInventory/g, 'pocketmine\\block\\inventory\\AnvilInventory'],
+  [/pocketmine\\inventory\\ChestInventory/g, 'pocketmine\\block\\inventory\\ChestInventory'],
+  [/pocketmine\\inventory\\DoubleChestInventory/g, 'pocketmine\\block\\inventory\\DoubleChestInventory'],
+  [/pocketmine\\inventory\\EnchantInventory/g, 'pocketmine\\block\\inventory\\EnchantInventory'],
+  [/pocketmine\\inventory\\EnderChestInventory/g, 'pocketmine\\block\\inventory\\EnderChestInventory'],
+  [/pocketmine\\inventory\\FurnaceInventory/g, 'pocketmine\\block\\inventory\\FurnaceInventory'],
+  [/pocketmine\\inventory\\ContainerInventory/g, 'pocketmine\\block\\inventory\\BlockInventory'],
+  // Crafting moves
+  [/pocketmine\\inventory\\CraftingGrid/g, 'pocketmine\\crafting\\CraftingGrid'],
+  [/pocketmine\\inventory\\CraftingManager/g, 'pocketmine\\crafting\\CraftingManager'],
+  [/pocketmine\\inventory\\CraftingRecipe/g, 'pocketmine\\crafting\\CraftingRecipe'],
+  [/pocketmine\\inventory\\ShapedRecipe/g, 'pocketmine\\crafting\\ShapedRecipe'],
+  [/pocketmine\\inventory\\ShapelessRecipe/g, 'pocketmine\\crafting\\ShapelessRecipe'],
+  [/pocketmine\\inventory\\FurnaceRecipe/g, 'pocketmine\\crafting\\FurnaceRecipe'],
+  // Factory -> Vanilla
+  [/pocketmine\\block\\BlockFactory/g, 'pocketmine\\block\\VanillaBlocks'],
+  [/pocketmine\\item\\ItemFactory/g, 'pocketmine\\item\\VanillaItems'],
+  [/pocketmine\\block\\BlockLegacyIds/g, 'pocketmine\\block\\BlockTypeIds'],
+  [/pocketmine\\item\\ItemIds/g, 'pocketmine\\item\\ItemTypeIds'],
+  // Utils
+  [/pocketmine\\utils\\UUID/g, 'Ramsey\\Uuid\\Uuid'],
+  [/pocketmine\\utils\\Color(?!Format)/g, 'pocketmine\\color\\Color'],
+  // Class renames
+  [/pocketmine\\lang\\BaseLang/g, 'pocketmine\\lang\\Language'],
+  [/pocketmine\\lang\\TranslationContainer/g, 'pocketmine\\lang\\Translatable'],
+  [/pocketmine\\command\\PluginIdentifiableCommand/g, 'pocketmine\\plugin\\PluginOwned'],
+  // Network
+  [/pocketmine\\network\\SourceInterface/g, 'pocketmine\\network\\NetworkInterface'],
+  [/pocketmine\\network\\AdvancedSourceInterface/g, 'pocketmine\\network\\AdvancedNetworkInterface'],
+  // Entity data
+  [/pocketmine\\entity\\DataPropertyManager/g, 'pocketmine\\network\\mcpe\\protocol\\types\\entity\\DataPropertyManager'],
+  // Thread
+  [/pocketmine\\thread\\BaseClassLoader/g, 'pocketmine\\thread\\ThreadSafeClassLoader'],
+  [/pocketmine\\thread\\ThreadedLogger/g, 'pocketmine\\thread\\ThreadSafeLogger'],
+  // Particle rename
+  [/DestroyBlockParticle/g, 'BlockBreakParticle'],
+  // Class renames
+  [/\bBaseLang\b/g, 'Language'],
+  [/\bTranslationContainer\b/g, 'Translatable'],
+  [/\bTextContainer\b/g, 'Translatable'],
+  // Interface rename
+  [/implements\s+PluginIdentifiableCommand/g, 'implements PluginOwned'],
+  // BlockIds rename
+  [/\bBlockLegacyIds\b/g, 'BlockTypeIds'],
+  [/\bBlockIds\b(?!::)/g, 'BlockTypeIds'],
+  [/\bItemIds\b(?!::)/g, 'ItemTypeIds'],
+];
+
+const METHOD_RULES = [
+  // === Server->WorldManager methods (MUST be before generic getLevel) ===
+  // Use negative lookbehind to avoid double-wrapping getNetworkSession
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->findEntity\(/g, '$1->getWorldManager()->findEntity(', 'Server->findEntity() → WorldManager'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->generateLevel\(/g, '$1->getWorldManager()->generateWorld(', 'generateLevel() → generateWorld()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->getAutoSave\(\)/g, '$1->getWorldManager()->getAutoSave()', 'Server->getAutoSave() → WorldManager'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->setAutoSave\(/g, '$1->getWorldManager()->setAutoSave(', 'Server->setAutoSave() → WorldManager'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->getDefaultLevel\(/g, '$1->getWorldManager()->getDefaultWorld(', 'getDefaultLevel() → getDefaultWorld()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->getLevel\(/g, '$1->getWorldManager()->getWorld(', 'Server->getLevel() → getWorld()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->getLevelByName\(/g, '$1->getWorldManager()->getWorldByName(', 'getLevelByName() → getWorldByName()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->getLevels\(/g, '$1->getWorldManager()->getWorlds(', 'getLevels() → getWorlds()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->isLevelGenerated\(/g, '$1->getWorldManager()->isWorldGenerated(', 'isLevelGenerated() → isWorldGenerated()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->isLevelLoaded\(/g, '$1->getWorldManager()->isWorldLoaded(', 'isLevelLoaded() → isWorldLoaded()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->loadLevel\(/g, '$1->getWorldManager()->loadWorld(', 'loadLevel() → loadWorld()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->unloadLevel\(/g, '$1->getWorldManager()->unloadWorld(', 'unloadLevel() → unloadWorld()'],
+  [/((?:->getServer\(\)|Server::getInstance\(\)))->setDefaultLevel\(/g, '$1->getWorldManager()->setDefaultWorld(', 'setDefaultLevel() → setDefaultWorld()'],
+  // Generic Level -> World (for non-Server contexts like Entity, Position)
+  [/->getLevelNonNull\(\)/g, '->getWorld()', 'getLevelNonNull() → getWorld()'],
+  [/->getLevel\(\)/g, '->getWorld()', 'getLevel() → getWorld()'],
+  [/->setLevel\(/g, '->setWorld(', 'setLevel() → setWorld()'],
+  // World method renames
+  [/->getWorldHeight\(\)/g, '->getMaxY()', 'getWorldHeight() → getMaxY()'],
+  [/->getCollisionCubes\(/g, '->getCollisionBoxes(', 'getCollisionCubes() → getCollisionBoxes()'],
+  [/->getChunks\(\)/g, '->getLoadedChunks()', 'getChunks() → getLoadedChunks()'],
+  // Spawn
+  [/->getSpawn\(/g, '->getSpawnLocation(', 'getSpawn() → getSpawnLocation()'],
+  [/->getLevelName\(\)/g, '->getWorld()->getFolderName()', 'getLevelName() → getWorld()->getFolderName()'],
+  // Block methods
+  [/->onActivate\(/g, '->onInteract(', 'onActivate() → onInteract()'],
+  [/->onEntityCollide\(/g, '->onEntityInside(', 'onEntityCollide() → onEntityInside()'],
+  [/->isSameType\(/g, '->hasSameTypeId(', 'isSameType() → hasSameTypeId()'],
+  [/->getHardness\(\)/g, '->getBreakInfo()->getHardness()', 'getHardness() → getBreakInfo()->getHardness()'],
+  [/->getBlastResistance\(\)/g, '->getBreakInfo()->getBlastResistance()', 'getBlastResistance() → getBreakInfo()->getBlastResistance()'],
+  [/->getToolType\(\)/g, '->getBreakInfo()->getToolType()', 'getToolType() → getBreakInfo()->getToolType()'],
+  [/->getToolHarvestLevel\(\)/g, '->getBreakInfo()->getToolHarvestLevel()', 'getToolHarvestLevel() → getBreakInfo()->getToolHarvestLevel()'],
+  [/->isBreakable\(\)/g, '->getBreakInfo()->isBreakable()', 'isBreakable() → getBreakInfo()->isBreakable()'],
+  [/->isCompatibleWithTool\(/g, '->getBreakInfo()->isToolCompatible(', 'isCompatibleWithTool() → isToolCompatible()'],
+  // Player network methods (avoid double-wrapping with negative lookbehind)
+  [/(?<!getNetworkSession\(\))->sendDataPacket\(/g, '->getNetworkSession()->sendDataPacket(', 'sendDataPacket() → getNetworkSession()->sendDataPacket()'],
+  [/->dataPacket\(/g, '->getNetworkSession()->sendDataPacket(', 'dataPacket() → getNetworkSession()->sendDataPacket()'],
+  [/->getAddress\(\)/g, '->getNetworkSession()->getIp()', 'getAddress() → getNetworkSession()->getIp()'],
+  [/->getDataPropertyManager\(\)/g, '->getNetworkProperties()', 'getDataPropertyManager() → getNetworkProperties()'],
+  // Player UI methods
+  [/->addWindow\(/g, '->setCurrentWindow(', 'addWindow() → setCurrentWindow()'],
+  [/->removeWindow\(/g, '->removeCurrentWindow(', 'removeWindow() → removeCurrentWindow()'],
+  [/->addTitle\(/g, '->sendTitle(', 'addTitle() → sendTitle()'],
+  [/->addSubTitle\(/g, '->sendSubTitle(', 'addSubTitle() → sendSubTitle()'],
+  [/->addActionBarMessage\(/g, '->sendActionBarMessage(', 'addActionBarMessage() → sendActionBarMessage()'],
+  // Player position (entity no longer extends Location)
+  [/\$(player|p|target|sender)->get(?:Floor)?(X|Y|Z)\(/g, '$$$1->getPosition()->get$2(', 'Player->getX/Y/Z() → getPosition()->getX/Y/Z()'],
+  [/\$(player|p|target|sender)->getYaw\(/g, '$$$1->getLocation()->getYaw(', 'Player->getYaw() → getLocation()->getYaw()'],
+  [/\$(player|p|target|sender)->getPitch\(/g, '$$$1->getLocation()->getPitch(', 'Player->getPitch() → getLocation()->getPitch()'],
+  // Human sub-managers: Hunger
+  [/->getFood\(\)/g, '->getHungerManager()->getFood()', 'getFood() → getHungerManager()->getFood()'],
+  [/->getMaxFood\(\)/g, '->getHungerManager()->getMaxFood()', 'getMaxFood() → getHungerManager()->getMaxFood()'],
+  [/->setFood\(/g, '->getHungerManager()->setFood(', 'setFood() → getHungerManager()->setFood()'],
+  [/->getSaturation\(\)/g, '->getHungerManager()->getSaturation()', 'getSaturation() → getHungerManager()->getSaturation()'],
+  [/->setSaturation\(/g, '->getHungerManager()->setSaturation(', 'setSaturation() → getHungerManager()->setSaturation()'],
+  [/->addSaturation\(/g, '->getHungerManager()->addSaturation(', 'addSaturation() → getHungerManager()'],
+  [/->getExhaustion\(\)/g, '->getHungerManager()->getExhaustion()', 'getExhaustion() → getHungerManager()'],
+  [/->setExhaustion\(/g, '->getHungerManager()->setExhaustion(', 'setExhaustion() → getHungerManager()'],
+  [/->exhaust\(/g, '->getHungerManager()->exhaust(', 'exhaust() → getHungerManager()->exhaust()'],
+  [/->isHungry\(\)/g, '->getHungerManager()->isHungry()', 'isHungry() → getHungerManager()'],
+  // Human sub-managers: XP
+  [/->getXpLevel\(\)/g, '->getXpManager()->getXpLevel()', 'getXpLevel() → getXpManager()->getXpLevel()'],
+  [/->setXpLevel\(/g, '->getXpManager()->setXpLevel(', 'setXpLevel() → getXpManager()->setXpLevel()'],
+  [/->addXpLevels\(/g, '->getXpManager()->addXpLevels(', 'addXpLevels() → getXpManager()'],
+  [/->subtractXpLevels\(/g, '->getXpManager()->subtractXpLevels(', 'subtractXpLevels() → getXpManager()'],
+  [/->addXp\(/g, '->getXpManager()->addXp(', 'addXp() → getXpManager()->addXp()'],
+  [/->subtractXp\(/g, '->getXpManager()->subtractXp(', 'subtractXp() → getXpManager()'],
+  [/->getXpProgress\(\)/g, '->getXpManager()->getXpProgress()', 'getXpProgress() → getXpManager()->getXpProgress()'],
+  [/->setXpProgress\(/g, '->getXpManager()->setXpProgress(', 'setXpProgress() → getXpManager()'],
+  [/->getCurrentTotalXp\(\)/g, '->getXpManager()->getCurrentTotalXp()', 'getCurrentTotalXp() → getXpManager()'],
+  [/->setCurrentTotalXp\(/g, '->getXpManager()->setCurrentTotalXp(', 'setCurrentTotalXp() → getXpManager()'],
+  [/->getLifetimeTotalXp\(\)/g, '->getXpManager()->getLifetimeTotalXp()', 'getLifetimeTotalXp() → getXpManager()'],
+  [/->canPickupXp\(\)/g, '->getXpManager()->canPickupXp()', 'canPickupXp() → getXpManager()'],
+  [/->resetXpCooldown\(\)/g, '->getXpManager()->resetXpCooldown()', 'resetXpCooldown() → getXpManager()'],
+  // Human inventory
+  [/->getEnderChestInventory\(\)/g, '->getEnderInventory()', 'getEnderChestInventory() → getEnderInventory()'],
+  [/->getRawUniqueId\(\)/g, '->getUniqueId()->getBytes()', 'getRawUniqueId() → getUniqueId()->getBytes()'],
+  // Effects sub-manager
+  [/->addEffect\(/g, '->getEffects()->add(', 'addEffect() → getEffects()->add()'],
+  [/->removeEffect\(/g, '->getEffects()->remove(', 'removeEffect() → getEffects()->remove()'],
+  [/->removeAllEffects\(\)/g, '->getEffects()->clear()', 'removeAllEffects() → getEffects()->clear()'],
+  [/->getEffect\(/g, '->getEffects()->get(', 'getEffect() → getEffects()->get()'],
+  [/->hasEffect\(/g, '->getEffects()->has(', 'hasEffect() → getEffects()->has()'],
+  // Entity
+  [/->isImmobile\(\)/g, '->hasNoClientPredictions()', 'isImmobile() → hasNoClientPredictions()'],
+  [/->setImmobile\(/g, '->setNoClientPredictions(', 'setImmobile() → setNoClientPredictions()'],
+  // Vector3 side constants → Facing
+  [/Vector3::SIDE_(NORTH|SOUTH|EAST|WEST|UP|DOWN)/g, 'Facing::$1', 'Vector3::SIDE_X → Facing::X'],
+  // AsyncTask: scheduleAsyncTask
+  [/->getScheduler\(\)->scheduleAsyncTask\(/g, '->getAsyncPool()->submitTask(', 'scheduleAsyncTask() → getAsyncPool()->submitTask()'],
+  // Plugin command
+  [/->getPlugin\(\)/g, '->getOwningPlugin()', 'getPlugin() → getOwningPlugin()'],
+];
+
+const EVENT_RULES = [
+  // Event calling — convert PluginManager->callEvent($ev) to $ev->call()
+  [/(?:->getServer\(\)->)?getPluginManager\(\)->callEvent\(\s*(\$\w+)\s*\)/g, '$1->call()', 'callEvent($ev) → $ev->call()'],
+  [/->callEvent\(\s*(\$\w+)\s*\)/g, '$1->call()', 'callEvent() → $event->call()'],
+  // Cancellation
+  [/->setCancelled\(\s*true\s*\)/g, '->cancel()', 'setCancelled(true) → cancel()'],
+  [/->setCancelled\(\s*false\s*\)/g, '->uncancel()', 'setCancelled(false) → uncancel()'],
+  [/->setCancelled\(\)/g, '->cancel()', 'setCancelled() → cancel()'],
+  // Event renames
+  [/\bExplosionPrimeEvent\b/g, 'EntityPreExplodeEvent', 'ExplosionPrimeEvent → EntityPreExplodeEvent'],
+  [/\bInventoryPickupItemEvent\b/g, 'EntityItemPickupEvent', 'InventoryPickupItemEvent → EntityItemPickupEvent'],
+  [/\bInventoryPickupArrowEvent\b/g, 'EntityItemPickupEvent', 'InventoryPickupArrowEvent → EntityItemPickupEvent'],
+  [/\bEntityLevelChangeEvent\b/g, 'EntityTeleportEvent /* TODO: was EntityLevelChangeEvent — compare worlds */', 'EntityLevelChangeEvent removed → EntityTeleportEvent'],
+  // Explosion event methods
+  [/->getForce\(\)/g, '->getRadius()', 'getForce() → getRadius() (explosion)'],
+  [/->setForce\(/g, '->setRadius(', 'setForce() → setRadius() (explosion)'],
+];
+
+const ITEM_BLOCK_RULES = [
+  // BlockFactory::getInstance()->get(id, meta) → VanillaBlocks
+  [/BlockFactory::getInstance\(\)->get\(\s*([^,()]+)\s*,\s*[^,()]*\s*\)/g, 'VanillaBlocks::$1()', 'BlockFactory::getInstance()->get() → VanillaBlocks'],
+  [/BlockFactory::getInstance\(\)->get\(\s*([^,()]+)\s*\)/g, 'VanillaBlocks::$1()', 'BlockFactory::getInstance()->get() → VanillaBlocks'],
+  // ItemFactory::getInstance()->get(id, meta) → VanillaItems
+  [/ItemFactory::getInstance\(\)->get\(\s*([^,()]+)\s*,\s*[^,()]*\s*\)/g, 'VanillaItems::$1()', 'ItemFactory::getInstance()->get() → VanillaItems'],
+  [/ItemFactory::getInstance\(\)->get\(\s*([^,()]+)\s*\)/g, 'VanillaItems::$1()', 'ItemFactory::getInstance()->get() → VanillaItems'],
+  // Item::get(Item::CONST) → VanillaItems::CONST()
+  [/Item::get\(\s*Item::([A-Z_]+)(?:\s*,\s*[^)]*?)?\s*\)/g, 'VanillaItems::$1()', 'Item::get(Item::X) → VanillaItems::X()'],
+  [/Block::get\(\s*Block::([A-Z_]+)(?:\s*,\s*[^)]*?)?\s*\)/g, 'VanillaBlocks::$1()', 'Block::get(Block::X) → VanillaBlocks::X()'],
+  // Block/Item static constant access → VanillaBlocks/VanillaItems
+  [/\bBlock::([A-Z][A-Z_]+)\b/g, 'VanillaBlocks::$1', 'Block::CONST → VanillaBlocks::CONST'],
+  [/\bItem::([A-Z][A-Z_]+)\b/g, 'VanillaItems::$1', 'Item::CONST → VanillaItems::CONST'],
+  // Factory function calls
+  [/BlockFactory::get\(/g, 'VanillaBlocks::get(', 'BlockFactory::get() → VanillaBlocks'],
+  [/ItemFactory::get\(/g, 'VanillaItems::get(', 'ItemFactory::get() → VanillaItems'],
+  [/Item::fromString\(/g, 'StringToItemParser::getInstance()->parse(', 'Item::fromString() → StringToItemParser'],
+  [/ItemFactory::fromString\(/g, 'StringToItemParser::getInstance()->parse(', 'ItemFactory::fromString() → StringToItemParser'],
+  // Effect
+  [/Effect::getEffect\(\s*Effect::([A-Z_]+)\s*\)/g, 'VanillaEffects::$1()', 'Effect::getEffect() → VanillaEffects::X()'],
+  [/Effect::getEffectByName\(/g, 'StringToEffectParser::getInstance()->parse(', 'getEffectByName() → StringToEffectParser'],
+  [/Effect::registerEffect\(/g, 'EffectIdMap::getInstance()->register(', 'Effect::registerEffect() → EffectIdMap'],
+  // Enchantment
+  [/Enchantment::get\(\s*Enchantment::([A-Z_]+)\s*\)/g, 'VanillaEnchantments::$1()', 'Enchantment::get() → VanillaEnchantments::X()'],
+  [/Enchantment::getEnchantmentByName\(/g, 'StringToEnchantmentParser::getInstance()->parse(', 'getEnchantmentByName() → StringToEnchantmentParser'],
+  // Biome
+  [/Biome::getBiome\(/g, 'BiomeRegistry::getInstance()->getBiome(', 'Biome::getBiome() → BiomeRegistry'],
+  // Creative inventory
+  [/Item::addCreativeItem\(/g, 'CreativeInventory::getInstance()->add(', 'Item::addCreativeItem() → CreativeInventory'],
+  [/Item::getCreativeItems\(\)/g, 'CreativeInventory::getInstance()->getAll()', 'Item::getCreativeItems() → CreativeInventory'],
+  [/Item::isCreativeItem\(/g, 'CreativeInventory::getInstance()->contains(', 'Item::isCreativeItem() → CreativeInventory'],
+  [/Item::removeCreativeItem\(/g, 'CreativeInventory::getInstance()->remove(', 'Item::removeCreativeItem() → CreativeInventory'],
+  // BlockToolType prefix removal
+  [/BlockToolType::TYPE_/g, 'BlockToolType::', 'BlockToolType::TYPE_X → BlockToolType::X'],
+];
+
+const TASK_RULES = [
+  // PluginTask -> Task
+  [/extends\s+PluginTask\b/g, 'extends Task', 'PluginTask removed → use Task'],
+  [/use\s+pocketmine\\scheduler\\PluginTask\s*;/g, 'use pocketmine\\scheduler\\Task;', 'PluginTask → Task import'],
+  // onRun signature — remove $currentTick parameter
+  [/function\s+onRun\s*\(\s*(?:int\s+)?\$currentTick\s*\)\s*(?::\s*void\s*)?/g, 'function onRun(): void', 'onRun($currentTick) → onRun(): void'],
+  // AsyncTask callbacks — remove Server parameter
+  [/function\s+onCompletion\s*\(\s*Server\s+\$\w+\s*\)\s*(?::\s*void\s*)?/g, 'function onCompletion(): void', 'onCompletion(Server) → onCompletion(): void'],
+  [/function\s+onProgressUpdate\s*\(\s*Server\s+\$\w+\s*(?:,\s*\$\w+\s*)?\)\s*(?::\s*void\s*)?/g, 'function onProgressUpdate(): void', 'onProgressUpdate(Server) → onProgressUpdate(): void'],
+  // Visibility: onEnable/onDisable/onLoad → protected
+  [/public\s+function\s+onEnable\s*\(\s*\)\s*(?::\s*void\s*)?(?=\s*\{)/g, 'protected function onEnable(): void ', 'onEnable: public → protected'],
+  [/public\s+function\s+onDisable\s*\(\s*\)\s*(?::\s*void\s*)?(?=\s*\{)/g, 'protected function onDisable(): void ', 'onDisable: public → protected'],
+  [/public\s+function\s+onLoad\s*\(\s*\)\s*(?::\s*void\s*)?(?=\s*\{)/g, 'protected function onLoad(): void ', 'onLoad: public → protected'],
+  // Permission manager
+  [/PluginManager->addPermission\(/g, 'PermissionManager::getInstance()->addPermission(', 'PluginManager→PermissionManager for permissions'],
+  [/PluginManager->getPermission\(/g, 'PermissionManager::getInstance()->getPermission(', 'PluginManager→PermissionManager for permissions'],
+  // Entity registration → EntityFactory pattern
+  [/Entity::registerEntity\(\s*([^,]+?)::class\s*,\s*true\s*\)/g,
+    'EntityFactory::getInstance()->register($1::class, function(World $$world, CompoundTag $$nbt) : $1 { return new $1(EntityDataHelper::parseLocation($$nbt, $$world), $$nbt); }, [\'$1\'])',
+    'Entity::registerEntity() → EntityFactory::getInstance()->register()'],
+  // UUID
+  [/UUID::fromData\(/g, 'Uuid::uuid3(Uuid::NAMESPACE_DNS, ', 'UUID::fromData() → Uuid::uuid3()'],
+  [/UUID::fromRandom\(\)/g, 'Uuid::uuid4()', 'UUID::fromRandom() → Uuid::uuid4()'],
+  [/UUID::fromBinary\(/g, 'Uuid::fromBytes(', 'UUID::fromBinary() → Uuid::fromBytes()'],
+  [/->toBinary\(\)/g, '->getBytes()', 'UUID->toBinary() → getBytes()'],
+  // Utils → Internet/Process
+  [/Utils::getURL\(/g, 'Internet::getURL(', 'Utils::getURL() → Internet::getURL()'],
+  [/Utils::postURL\(/g, 'Internet::postURL(', 'Utils::postURL() → Internet::postURL()'],
+  [/Utils::simpleCurl\(/g, 'Internet::simpleCurl(', 'Utils::simpleCurl() → Internet::simpleCurl()'],
+  [/Utils::getIP\(\)/g, 'Internet::getIP()', 'Utils::getIP() → Internet::getIP()'],
+  [/Utils::execute\(/g, 'Process::execute(', 'Utils::execute() → Process::execute()'],
+  [/Utils::getMemoryUsage\(\)/g, 'Process::getMemoryUsage()', 'Utils::getMemoryUsage() → Process::getMemoryUsage()'],
+  [/Utils::kill\(/g, 'Process::kill(', 'Utils::kill() → Process::kill()'],
+  // Handler
+  [/->setHandler\(\);/g, '->setHandler(null);', 'setHandler() → setHandler(null)'],
+];
+
+const YML_RULES = [
+  [/^(api:\s*)(?:3\.\d+\.\d+|4\.\d+\.\d+|\[.*?\])\s*$/gm, '${1}5.0.0', 'API version → 5.0.0'],
+];
+
+let logs = [];
+let convertedCode = '';
+let convertedFiles = [];
+
+function addLog(type, message) {
+  logs.push({ type, message });
+}
+
+function applyRules(code, rules, category) {
+  let count = 0;
+  for (const rule of rules) {
+    const desc = rule[2] || '';
+    const before = code;
+    code = code.replace(rule[0], rule[1]);
+    if (code !== before) {
+      const matches = (before.match(rule[0]) || []).length;
+      count += matches;
+      addLog('replace', `<code>${desc || rule[0].source}</code> (${matches}x)`);
+    }
+  }
+  return { code, count };
+}
+
+function convertCode(input) {
+  logs = [];
+  let code = input;
+  let totalChanges = 0;
+  let warnings = 0;
+
+  const opts = {
+    ns: document.getElementById('optNs').checked,
+    methods: document.getElementById('optMethods').checked,
+    events: document.getElementById('optEvents').checked,
+    items: document.getElementById('optItems').checked,
+    tasks: document.getElementById('optTasks').checked,
+    yml: document.getElementById('optYml').checked,
+  };
+
+  const isYml = code.trimStart().startsWith('name:') || code.includes('api:') && code.includes('main:');
+
+  if (isYml && opts.yml) {
+    const r = applyRules(code, YML_RULES, 'plugin.yml');
+    code = r.code;
+    totalChanges += r.count;
+  } else {
+    if (opts.ns) {
+      const r = applyRules(code, NAMESPACE_RULES, 'Namespaces');
+      code = r.code;
+      totalChanges += r.count;
+    }
+    if (opts.methods) {
+      const r = applyRules(code, METHOD_RULES, 'Methods');
+      code = r.code;
+      totalChanges += r.count;
+    }
+    if (opts.events) {
+      const r = applyRules(code, EVENT_RULES, 'Events');
+      code = r.code;
+      totalChanges += r.count;
+    }
+    if (opts.items) {
+      const r = applyRules(code, ITEM_BLOCK_RULES, 'Items/Blocks');
+      code = r.code;
+      totalChanges += r.count;
+    }
+    if (opts.tasks) {
+      const r = applyRules(code, TASK_RULES, 'Tasks/Utils');
+      code = r.code;
+      totalChanges += r.count;
+    }
+
+    // Detect patterns that need manual review (warnings)
+    const warnPatterns = [
+      // Entity system
+      [/Entity::createEntity\(/g, 'Entity::createEntity() removed — instantiate entities directly with Location'],
+      [/Entity::createBaseNBT\(/g, 'Entity::createBaseNBT() removed — pass data to constructor'],
+      [/->namedtag\b/g, 'Entity->namedtag removed — use initEntity()/saveNBT()'],
+      // Numeric IDs
+      [/Item::get\(\s*\d+/g, 'Numeric Item IDs removed — use VanillaItems::CONSTANT()'],
+      [/Block::get\(\s*\d+/g, 'Numeric Block IDs removed — use VanillaBlocks::CONSTANT()'],
+      [/BlockFactory::get\(\s*\d+/g, 'BlockFactory::get() with numeric ID removed'],
+      [/ItemFactory::get\(\s*\d+/g, 'ItemFactory::get() with numeric ID removed'],
+      // getId/getMeta deprecated
+      [/->getId\(\)/g, 'getId() → getTypeId() for items/blocks (verify context)'],
+      [/->getMeta\(\)/g, 'getMeta() removed in PM5 for items/blocks'],
+      [/->getDamage\(\)/g, 'getDamage() removed in PM5 — refactor needed'],
+      [/->setDamage\(/g, 'setDamage() removed in PM5 — refactor needed'],
+      // NBT API removed from Item
+      [/->getCompoundTag\(\)/g, 'Item->getCompoundTag() removed — use typed API'],
+      [/->setCompoundTag\(/g, 'Item->setCompoundTag() removed — use typed API'],
+      [/->hasCompoundTag\(\)/g, 'Item->hasCompoundTag() removed — use typed API'],
+      [/->setNamedTagEntry\(/g, 'Item->setNamedTagEntry() removed — use typed API'],
+      [/->getNamedTagEntry\(/g, 'Item->getNamedTagEntry() removed — use typed API'],
+      [/->removeNamedTagEntry\(/g, 'Item->removeNamedTagEntry() removed — use typed API'],
+      // Removed events
+      [/PlayerCommandPreprocessEvent/g, 'PlayerCommandPreprocessEvent removed in PM5'],
+      [/PlayerCheatEvent/g, 'PlayerCheatEvent removed in PM5'],
+      [/PlayerIllegalMoveEvent/g, 'PlayerIllegalMoveEvent removed in PM5'],
+      [/EntityArmorChangeEvent/g, 'EntityArmorChangeEvent removed in PM5'],
+      [/RemoteConsoleCommandSender/g, 'RemoteConsoleCommandSender removed in PM5'],
+      [/CustomInventory/g, 'CustomInventory removed in PM4 — needs manual rewrite'],
+      [/CreativeInventoryAction/g, 'CreativeInventoryAction removed in PM5'],
+      // Metadata removed
+      [/pocketmine\\metadata\\/g, 'Metadata system completely removed in PM5'],
+      // Op system
+      [/->isOp\(\)/g, 'isOp() removed — use hasPermission(DefaultPermissions::ROOT_OPERATOR)'],
+      [/->setOp\(/g, 'setOp() removed — use permission attachments'],
+      // Item->count private
+      [/->count\s*[=+\-]/g, 'Item->count is now private — use getCount()/setCount()'],
+      // Potion class removed
+      [/Potion::getPotionEffectsById\(/g, 'Potion::getPotionEffectsById() removed — use Effect/EffectIdMap'],
+      [/\bPotion::/g, 'Potion class removed in PM5 — use Effect/EffectIdMap instead'],
+      // GameMode changed
+      [/->getGamemode\(\)/g, 'GameMode is now a class, not int — verify usage'],
+      // json_encode on items
+      [/json_encode\(\s*\$\w*[iI]tem/g, 'json_encode() on Items no longer works in PM5 — use Item serialization methods'],
+      // Interaction air clicks removed
+      [/PlayerInteractEvent::(?:RIGHT|LEFT)_CLICK_AIR/g, 'Air click types removed from PlayerInteractEvent'],
+      // Server removed methods
+      [/->getServer\(\)->reload\(\)/g, 'Server::reload() removed in PM5'],
+      [/Server::getInstance\(\)->reload\(\)/g, 'Server::reload() removed in PM5'],
+    ];
+
+    for (const [pattern, msg] of warnPatterns) {
+      const matches = code.match(pattern);
+      if (matches) {
+        warnings += matches.length;
+        addLog('warn', `${msg} (${matches.length}x)`);
+      }
+    }
+  }
+
+  const lines = code.split('\n').length;
+
+  if (totalChanges === 0 && warnings === 0) {
+    addLog('info', 'No changes needed — code may already be PM5 compatible');
+  }
+
+  return { code, totalChanges, warnings, lines };
+}
+
+function highlightPHP(code) {
+  return code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/(\/\/.*$|\/\*[\s\S]*?\*\/|#.*$)/gm, '<span class="cmt">$1</span>')
+    .replace(/('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")/g, '<span class="str">$1</span>')
+    .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="num">$1</span>')
+    .replace(/(\$\w+)/g, '<span class="var">$1</span>')
+    .replace(/(->|::)/g, '<span class="arrow">$1</span>')
+    .replace(/\b(use|namespace|class|extends|implements|function|return|if|else|elseif|foreach|for|while|switch|case|break|continue|new|public|protected|private|static|final|abstract|const|throw|try|catch|finally|yield|match|enum|readonly|true|false|null|void|int|string|float|bool|array|self|parent)\b/g, '<span class="kw">$1</span>');
+}
+
+function renderLog() {
+  const body = document.getElementById('logBody');
+  const panel = document.getElementById('logPanel');
+  const count = document.getElementById('logCount');
+
+  if (logs.length === 0) {
+    panel.classList.remove('active');
+    return;
+  }
+
+  panel.classList.add('active');
+  count.textContent = logs.length;
+
+  body.innerHTML = logs.map(l => {
+    const iconCls = l.type === 'replace' ? 'replace' : l.type === 'warn' ? 'warn' : 'info';
+    const iconText = l.type === 'replace' ? '&#10003;' : l.type === 'warn' ? '!' : 'i';
+    return `<div class="log-item"><div class="log-icon ${iconCls}">${iconText}</div><div class="log-text">${l.message}</div></div>`;
+  }).join('');
+}
+
+function doConvert() {
+  const input = document.getElementById('inputCode').value.trim();
+  if (!input) return;
+
+  const result = convertCode(input);
+  convertedCode = result.code;
+
+  const outputEl = document.getElementById('outputCode');
+  outputEl.innerHTML = '<div class="highlight">' + highlightPHP(result.code) + '</div>';
+
+  document.getElementById('statsPanel').style.display = '';
+  document.getElementById('statChanges').textContent = result.totalChanges;
+  document.getElementById('statWarnings').textContent = result.warnings;
+  document.getElementById('statLines').textContent = result.lines;
+
+  document.getElementById('copyBtn').disabled = false;
+  document.getElementById('downloadBtn').disabled = false;
+
+  renderLog();
+
+  document.getElementById('statsPanel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function doCopy() {
+  if (!convertedCode) return;
+  navigator.clipboard.writeText(convertedCode).then(() => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function doClear() {
+  document.getElementById('inputCode').value = '';
+  document.getElementById('outputCode').innerHTML = '';
+  document.getElementById('statsPanel').style.display = 'none';
+  document.getElementById('logPanel').classList.remove('active');
+  document.getElementById('copyBtn').disabled = true;
+  document.getElementById('downloadBtn').disabled = true;
+  convertedCode = '';
+  convertedFiles = [];
+  logs = [];
+}
+
+function doDownload() {
+  if (!convertedCode) return;
+  const blob = new Blob([convertedCode], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'converted.php';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function handleFiles(files) {
+  if (!files || files.length === 0) return;
+
+  const file = files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('inputCode').value = e.target.result;
+    if (file.name.endsWith('.yml') || file.name.endsWith('.yaml')) {
+      // Auto-detect yml
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Event listeners
+document.getElementById('convertBtn').addEventListener('click', doConvert);
+document.getElementById('copyBtn').addEventListener('click', doCopy);
+document.getElementById('clearBtn').addEventListener('click', doClear);
+document.getElementById('downloadBtn').addEventListener('click', doDownload);
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  handleFiles(e.target.files);
+});
+
+// Drag and drop
+const dropzone = document.getElementById('dropzone');
+['dragenter', 'dragover'].forEach(ev => {
+  dropzone.addEventListener(ev, function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.add('dragover');
+  });
+});
+['dragleave', 'drop'].forEach(ev => {
+  dropzone.addEventListener(ev, function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    dropzone.classList.remove('dragover');
+  });
+});
+dropzone.addEventListener('drop', function(e) {
+  handleFiles(e.dataTransfer.files);
+});
+
+// Keyboard shortcut: Ctrl+Enter to convert
+document.getElementById('inputCode').addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    doConvert();
+  }
+  // Tab support in textarea
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = this.selectionStart;
+    const end = this.selectionEnd;
+    this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+    this.selectionStart = this.selectionEnd = start + 4;
+  }
+});
+</script>
+</body>
+</html>
